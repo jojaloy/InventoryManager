@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 object RetrofitClient {
 
     // ⚠️ REPLACE THIS WITH YOUR MOCKAPI BASE URL
-    private const val BASE_URL = "https://67f9c7f7094de2fe6ea0d3f2.mockapi.io/api/v1/"
+    private const val BASE_URL = "https://6a04386e2afe8349b4b6229a.mockapi.io/api/v1/"
 
     /**
      * OkHttpClient with logging + timeouts

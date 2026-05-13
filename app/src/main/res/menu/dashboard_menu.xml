@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_refresh"
+        android:title="Refresh"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_sort"
+        android:icon="@drawable/ic_sort"
+        android:title="Sort By"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/action_sort_name_asc"
+                android:title="Name (A-Z)" />
+            <item
+                android:id="@+id/action_sort_name_desc"
+                android:title="Name (Z-A)" />
+            <item
+                android:id="@+id/action_sort_price_asc"
+                android:title="Price (Low to High)" />
+            <item
+                android:id="@+id/action_sort_price_desc"
+                android:title="Price (High to Low)" />
+            <item
+                android:id="@+id/action_sort_qty_asc"
+                android:title="Quantity (Low to High)" />
+            <item
+                android:id="@+id/action_sort_qty_desc"
+                android:title="Quantity (High to Low)" />
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/action_logout"
+        android:icon="@drawable/ic_logout"
+        android:title="Logout"
+        app:showAsAction="never" />
+
+</menu>
