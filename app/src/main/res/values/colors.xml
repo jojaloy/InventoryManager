@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary palette — deep slate blue -->
+    <color name="colorPrimary">#2C3E6B</color>
+    <color name="colorPrimaryVariant">#1A2847</color>
+    <color name="colorPrimaryLight">#4A6FA5</color>
+
+    <!-- Accent / Secondary — warm amber -->
+    <color name="colorSecondary">#E8A838</color>
+    <color name="colorSecondaryVariant">#C88A20</color>
+
+    <!-- Background shades -->
+    <color name="colorBackground">#F4F5F7</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorSurfaceVariant">#EEF0F4</color>
+
+    <!-- Text -->
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorTextPrimary">#1A1F36</color>
+    <color name="colorTextSecondary">#6B7280</color>
+    <color name="colorTextHint">#9CA3AF</color>
+
+    <!-- Status colors -->
+    <color name="colorInStock">#16A34A</color>
+    <color name="colorInStockBg">#DCFCE7</color>
+    <color name="colorOutOfStock">#DC2626</color>
+    <color name="colorOutOfStockBg">#FEE2E2</color>
+    <color name="colorLowStock">#D97706</color>
+    <color name="colorLowStockBg">#FEF3C7</color>
+
+    <!-- UI elements -->
+    <color name="colorDivider">#E5E7EB</color>
+    <color name="colorCardBorder">#E8EBF0</color>
+    <color name="colorShadow">#1A000000</color>
+
+    <!-- Shimmer -->
+    <color name="shimmerBase">#E5E7EB</color>
+    <color name="shimmerHighlight">#F9FAFB</color>
+
+    <!-- Category colors for initials -->
+    <color name="catColor1">#6366F1</color>
+    <color name="catColor2">#EC4899</color>
+    <color name="catColor3">#14B8A6</color>
+    <color name="catColor4">#F59E0B</color>
+    <color name="catColor5">#10B981</color>
+</resources>
