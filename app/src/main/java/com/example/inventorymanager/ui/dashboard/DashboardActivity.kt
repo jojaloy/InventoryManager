@@ -25,6 +25,7 @@ import com.inventory.manager.utils.gone
 import com.inventory.manager.utils.snackbar
 import com.inventory.manager.utils.visible
 import com.inventory.manager.viewmodel.InventoryViewModel
+import java.util.stream.Collectors.toList
 
 /**
  * DashboardActivity — the main screen.
@@ -75,7 +76,6 @@ class DashboardActivity : AppCompatActivity() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@DashboardActivity)
             adapter = this@DashboardActivity.adapter
-            setHasFixedSize(true)
         }
     }
 
@@ -136,7 +136,7 @@ class DashboardActivity : AppCompatActivity() {
 
         // Observe filtered list (shown in RecyclerView)
         viewModel.filteredItems.observe(this) { items ->
-            adapter.submitList(items)
+            adapter.submitList(items.toList())
             if (items.isEmpty()) {
                 binding.recyclerView.gone()
                 binding.layoutEmpty.visible()
