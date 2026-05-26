@@ -39,16 +39,21 @@ class InventoryViewModel : ViewModel() {
     var currentSearchQuery: String = ""
 
     /**
-     * Load all items from the API.
+     * Load all items from the API and filter them by the logged-in userId.
      */
-    fun loadAllItems() {
+    fun loadAllItems(userId: String) {
         _items.value = ApiResult.Loading
         viewModelScope.launch {
             val result = repository.getAllItems()
-            _items.value = result
+
             if (result is ApiResult.Success) {
-                allItems = result.data
+                // Filter the list so we only keep items belonging to this user
+                val userItems = result.data.filter { it.userId == userId }
+                allItems = userItems
+                _items.value = ApiResult.Success(userItems)
                 applyFilter(currentSearchQuery)
+            } else {
+                _items.value = result // Propagate the error
             }
         }
     }
@@ -66,13 +71,13 @@ class InventoryViewModel : ViewModel() {
     /**
      * Create a new inventory item.
      */
-    fun createItem(item: InventoryItem) {
+    fun createItem(item: InventoryItem, currentUserId: String) {
         _operationResult.value = ApiResult.Loading
         viewModelScope.launch {
             val result = repository.createItem(item)
             _operationResult.value = result
             if (result is ApiResult.Success) {
-                loadAllItems() // Refresh the list
+                loadAllItems(currentUserId) // Refresh the list for this user
             }
         }
     }
@@ -80,13 +85,13 @@ class InventoryViewModel : ViewModel() {
     /**
      * Update an existing inventory item.
      */
-    fun updateItem(id: String, item: InventoryItem) {
+    fun updateItem(id: String, item: InventoryItem, currentUserId: String) {
         _operationResult.value = ApiResult.Loading
         viewModelScope.launch {
             val result = repository.updateItem(id, item)
             _operationResult.value = result
             if (result is ApiResult.Success) {
-                loadAllItems() // Refresh the list
+                loadAllItems(currentUserId) // Refresh the list for this user
             }
         }
     }
@@ -94,13 +99,13 @@ class InventoryViewModel : ViewModel() {
     /**
      * Delete an inventory item.
      */
-    fun deleteItem(id: String) {
+    fun deleteItem(id: String, currentUserId: String) {
         _operationResult.value = ApiResult.Loading
         viewModelScope.launch {
             val result = repository.deleteItem(id)
             _operationResult.value = result
             if (result is ApiResult.Success) {
-                loadAllItems() // Refresh the list
+                loadAllItems(currentUserId) // Refresh the list for this user
             }
         }
     }
@@ -115,8 +120,8 @@ class InventoryViewModel : ViewModel() {
         } else {
             allItems.filter { item ->
                 item.itemName.contains(query, ignoreCase = true) ||
-                item.category.contains(query, ignoreCase = true) ||
-                item.supplier.contains(query, ignoreCase = true)
+                        item.category.contains(query, ignoreCase = true) ||
+                        item.supplier.contains(query, ignoreCase = true)
             }
         }
     }

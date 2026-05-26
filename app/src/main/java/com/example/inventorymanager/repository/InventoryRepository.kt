@@ -3,6 +3,7 @@ package com.inventory.manager.repository
 import com.inventory.manager.api.RetrofitClient
 import com.inventory.manager.model.ApiResult
 import com.inventory.manager.model.InventoryItem
+import com.inventory.manager.model.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -97,6 +98,48 @@ class InventoryRepository {
                 ApiResult.Success(response.body() ?: InventoryItem())
             } else {
                 ApiResult.Error("Failed to delete item. Code: ${response.code()}", response.code())
+            }
+        } catch (e: Exception) {
+            ApiResult.Error(parseException(e))
+        }
+    }
+
+    // --- Auth Operations ---
+
+    suspend fun login(username: String): ApiResult<User?> = withContext(Dispatchers.IO) {
+        try {
+            val response = api.getUsers(username)
+            if (response.isSuccessful) {
+                val users = response.body()
+                if (!users.isNullOrEmpty()) {
+                    ApiResult.Success(users.first())
+                } else {
+                    ApiResult.Error("User not found.")
+                }
+            } else {
+                ApiResult.Error("Failed to login. Code: ${response.code()}", response.code())
+            }
+        } catch (e: Exception) {
+            ApiResult.Error(parseException(e))
+        }
+    }
+
+    suspend fun register(user: User): ApiResult<User> = withContext(Dispatchers.IO) {
+        try {
+            // First check if the username already exists
+            val existingUserResponse = api.getUsers(user.username)
+            if (existingUserResponse.isSuccessful && !existingUserResponse.body().isNullOrEmpty()) {
+                return@withContext ApiResult.Error("Username already exists. Please choose another.")
+            }
+
+            // Create new user
+            val response = api.createUser(user)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    ApiResult.Success(it)
+                } ?: ApiResult.Error("Registration succeeded but response was empty.")
+            } else {
+                ApiResult.Error("Failed to register. Code: ${response.code()}", response.code())
             }
         } catch (e: Exception) {
             ApiResult.Error(parseException(e))

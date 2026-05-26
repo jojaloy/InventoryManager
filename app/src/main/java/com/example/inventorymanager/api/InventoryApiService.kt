@@ -1,6 +1,7 @@
 package com.inventory.manager.api
 
 import com.inventory.manager.model.InventoryItem
+import com.inventory.manager.model.User
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -45,4 +46,16 @@ interface InventoryApiService {
      */
     @DELETE("items/{id}")
     suspend fun deleteItem(@Path("id") id: String): Response<InventoryItem>
+
+    /**
+     * GET users by username (used for login and checking if a user exists)
+     */
+    @GET("users")
+    suspend fun getUsers(@Query("username") username: String): Response<List<User>>
+
+    /**
+     * POST — Create a new user (Registration)
+     */
+    @POST("users")
+    suspend fun createUser(@Body user: User): Response<User>
 }

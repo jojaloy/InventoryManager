@@ -2,6 +2,7 @@ package com.inventory.manager.ui.detail
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -26,13 +27,21 @@ class DetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailBinding
     private val viewModel: InventoryViewModel by viewModels()
+    private lateinit var prefs: SharedPreferences
     private var itemId: String = ""
     private var currentItem: InventoryItem? = null
+
+    // Retrieve the user ID from SharedPreferences
+    private val currentUserId: String
+        get() = prefs.getString("PREF_USER_ID", prefs.getString(Constants.PREF_USERNAME, "")) ?: ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Initialize SharedPreferences
+        prefs = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
 
         itemId = intent.getStringExtra(Constants.EXTRA_ITEM_ID) ?: ""
 
@@ -41,6 +50,14 @@ class DetailActivity : AppCompatActivity() {
         observeViewModel()
 
         viewModel.loadItemById(itemId)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Reload item in case we are returning from AddEditActivity after an update
+        if (itemId.isNotEmpty()) {
+            viewModel.loadItemById(itemId)
+        }
     }
 
     private fun setupToolbar() {
@@ -63,7 +80,8 @@ class DetailActivity : AppCompatActivity() {
                     .setTitle("Delete Item")
                     .setMessage("Are you sure you want to delete \"${item.itemName}\"?")
                     .setPositiveButton("Delete") { _, _ ->
-                        viewModel.deleteItem(item.id)
+                        // Pass the current user ID to the delete function
+                        viewModel.deleteItem(item.id, currentUserId)
                     }
                     .setNegativeButton("Cancel", null)
                     .setIcon(R.drawable.ic_delete)

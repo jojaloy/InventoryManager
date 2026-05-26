@@ -25,18 +25,17 @@ import com.inventory.manager.utils.gone
 import com.inventory.manager.utils.snackbar
 import com.inventory.manager.utils.visible
 import com.inventory.manager.viewmodel.InventoryViewModel
-import java.util.stream.Collectors.toList
 
-/**
- * DashboardActivity — the main screen.
- * Shows the inventory list, search, FAB to add items, sort menu.
- */
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDashboardBinding
     private val viewModel: InventoryViewModel by viewModels()
     private lateinit var adapter: InventoryAdapter
     private lateinit var prefs: SharedPreferences
+
+    // Retrieve the user ID (falling back to username if ID wasn't saved in preferences)
+    private val currentUserId: String
+        get() = prefs.getString("PREF_USER_ID", prefs.getString(Constants.PREF_USERNAME, "")) ?: ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +56,6 @@ class DashboardActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh when returning from Add/Edit/Detail
         loadData()
     }
 
@@ -107,7 +105,6 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        // Observe full item loading state
         viewModel.items.observe(this) { result ->
             binding.swipeRefresh.isRefreshing = false
             when (result) {
@@ -134,7 +131,6 @@ class DashboardActivity : AppCompatActivity() {
             }
         }
 
-        // Observe filtered list (shown in RecyclerView)
         viewModel.filteredItems.observe(this) { items ->
             adapter.submitList(items.toList())
             if (items.isEmpty()) {
@@ -146,17 +142,15 @@ class DashboardActivity : AppCompatActivity() {
             }
         }
 
-        // Observe CRUD operation results
         viewModel.operationResult.observe(this) { result ->
             result ?: return@observe
             when (result) {
-                is ApiResult.Loading -> { /* handled per-operation */ }
+                is ApiResult.Loading -> { }
                 is ApiResult.Success -> {
                     binding.root.snackbar("Operation successful ✓")
                 }
                 is ApiResult.Error -> {
                     binding.root.snackbar("Error: ${result.message}", actionText = "Retry") {
-                        // Retry will re-load
                         loadData()
                     }
                 }
@@ -180,7 +174,8 @@ class DashboardActivity : AppCompatActivity() {
             binding.root.snackbar("No internet connection", actionText = "Retry") { loadData() }
             return
         }
-        viewModel.loadAllItems()
+        // Pass the user ID so the ViewModel only loads this user's items
+        viewModel.loadAllItems(currentUserId)
     }
 
     private fun openDetail(item: InventoryItem) {
@@ -201,7 +196,8 @@ class DashboardActivity : AppCompatActivity() {
             .setTitle("Delete Item")
             .setMessage("Are you sure you want to delete \"${item.itemName}\"? This action cannot be undone.")
             .setPositiveButton("Delete") { _, _ ->
-                viewModel.deleteItem(item.id)
+                // Pass currentUserId so the list refreshes correctly after deletion
+                viewModel.deleteItem(item.id, currentUserId)
             }
             .setNegativeButton("Cancel", null)
             .setIcon(R.drawable.ic_delete)

@@ -10,6 +10,10 @@ data class InventoryItem(
     @SerializedName("id")
     val id: String = "",
 
+    // Added userId to tie items to specific users
+    @SerializedName("userId")
+    val userId: String = "",
+
     @SerializedName("itemName")
     val itemName: String = "",
 

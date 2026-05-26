@@ -1,5 +1,6 @@
 package com.inventory.manager.ui.add_edit
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ArrayAdapter
@@ -18,24 +19,26 @@ import com.inventory.manager.utils.snackbar
 import com.inventory.manager.utils.visible
 import com.inventory.manager.viewmodel.InventoryViewModel
 
-/**
- * AddEditActivity — handles both creating new items and editing existing ones.
- * Receives EXTRA_ITEM_ID and EXTRA_IS_EDIT from the calling Activity.
- */
 class AddEditActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddEditBinding
     private val viewModel: InventoryViewModel by viewModels()
+    private lateinit var prefs: SharedPreferences
 
     private var isEdit = false
     private var itemId: String = ""
     private var existingItem: InventoryItem? = null
+
+    // Retrieve the user ID from SharedPreferences
+    private val currentUserId: String
+        get() = prefs.getString("PREF_USER_ID", prefs.getString(Constants.PREF_USERNAME, "")) ?: ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        prefs = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
         isEdit = intent.getBooleanExtra(Constants.EXTRA_IS_EDIT, false)
         itemId = intent.getStringExtra(Constants.EXTRA_ITEM_ID) ?: ""
 
@@ -122,8 +125,16 @@ class AddEditActivity : AppCompatActivity() {
             DateUtils.getCurrentDate()
         }
 
+        // Make sure to preserve existing userId on edit, or assign current on creation
+        val itemUserId = if (isEdit && existingItem != null) {
+            existingItem!!.userId
+        } else {
+            currentUserId
+        }
+
         val item = InventoryItem(
             id = if (isEdit) itemId else "",
+            userId = itemUserId, // Pass the user ID to the item
             itemName = name,
             category = category,
             quantity = quantity,
@@ -134,9 +145,9 @@ class AddEditActivity : AppCompatActivity() {
         )
 
         if (isEdit) {
-            viewModel.updateItem(itemId, item)
+            viewModel.updateItem(itemId, item, currentUserId)
         } else {
-            viewModel.createItem(item)
+            viewModel.createItem(item, currentUserId)
         }
     }
 
